@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <h2>List</h2>
+    <ul data-bind="foreach: presidents">
+      <li data-bind="text: $data"></li>
+    </ul>
+    <h2>Output</h2>
+    <div data-bind="html: debugOutput"></div>
+    
+    <script src="http://ajax.aspnetcdn.com/ajax/knockout/knockout-2.2.1.js"></script>
+    <script src="../src/betterObservableArray.js"></script>
+    <script>
+      function TestViewModel () {
+        this.presidents = ko.betterObservableArray();
+        this.debugOutput = ko.observable("");
+
+        //use the normal knockout subscribe method, but pass in the new "add" or "remove" types.
+        this.presidents.subscribe(this.presidentAdded, this, "add");
+        this.presidents.subscribe(this.presidentRemoved, this, "remove");
+      }
+      TestViewModel.prototype.presidentAdded = function (president) {
+        this.log(president + " Added");
+      };
+
+      TestViewModel.prototype.presidentRemoved = function (president) {
+        this.log(president + " Removed");
+      };
+
+
+      //quick loggin helper
+      TestViewModel.prototype.log = function (msg) {
+        console.log(msg);
+        this.debugOutput(
+          this.debugOutput() + "<br/>" + msg
+        );
+      }
+
+      //tests (both to make sure this works, and to show you how to use it)
+      TestViewModel.prototype.test1 = function () {
+        this.log("test 1 : Simple Pusk.  Expecting 1 addition");
+        this.presidents.push("George Washington");
+      };
+      TestViewModel.prototype.test2 = function () {
+        this.log("test 2 : Multiple Push. Expecting 3 additions");
+        this.presidents.push("John Adams", "Thomas Jefferson", "Bill Clinton", "Andrew Jackson");
+      }
+      TestViewModel.prototype.test3 = function () {
+        this.log("test 3 : Unshift. Expecting 1 addition");
+        this.presidents.unshift("King George III");
+      }
+      TestViewModel.prototype.test4 = function () {
+        this.log("test 4 : Shift. Expecting 1 removal");
+        this.presidents.shift();
+      }
+      TestViewModel.prototype.test5 = function () {
+        this.log("test 4 : splice. Expecting 1 removal and 3 additions");
+        this.presidents.splice(3, 1, "James Madison", "James Monroe", "John Quincy Adams");
+      }
+      TestViewModel.prototype.test6 = function () {
+        this.log("test 4 : Shift. Expecting 1 removal");
+        this.presidents.shift();
+      }
+
+      var testVm = new TestViewModel();
+      ko.applyBindings(testVm);
+
+      testVm.test1();
+      testVm.test2();
+      testVm.test3();
+      testVm.test4();
+      testVm.test5();
+
+    </script>
+  </body>
+</html>
